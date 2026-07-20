@@ -1,8 +1,8 @@
-// This program prints it self
+// This program prints itself.
 (() => {
     const _ = unescape("%27")
     const $ = [
-        '// This program prints it self',
+        '// This program prints itself.',
         '(() => {',
         '    const _ = unescape("%27")',
         '    const $ = [',
