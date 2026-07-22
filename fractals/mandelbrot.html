@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Générateur de Fractale - Mandelbrot</title>
+    <style>
+        body { background-color: #111; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        canvas { border: 1px solid #333; box-shadow: 0 0 15px rgba(0,0,0,0.5); }
+    </style>
+</head>
+<body>
+
+<canvas id="fractalCanvas" width="800" height="600"></canvas>
+
+<script>
+const canvas = document.getElementById('fractalCanvas');
+const ctx = canvas.getContext('2d');
+const width = canvas.width;
+const height = canvas.height;
+const imgData = ctx.createImageData(width, height);
+const pixels = imgData.data;
+
+const MAX_ITERATIONS = 400;
+const aspectRatio = width / height;
+
+// Cible et niveau de zoom : molette pour zoomer / dézoomer
+let centerX = -0.743643887;
+let centerY = 0.131825904;
+let zoom = 300;
+
+function draw() {
+    const rangeY = 2.4 / zoom;
+    const rangeX = rangeY * aspectRatio;
+    const minReal = centerX - rangeX / 2;
+    const minImag = centerY - rangeY / 2;
+    const stepX = rangeX / width;
+    const stepY = rangeY / height;
+
+    for (let py = 0; py < height; py++) {
+        const ci = minImag + py * stepY;
+        for (let px = 0; px < width; px++) {
+            const cr = minReal + px * stepX;
+
+            let zr = 0, zi = 0, iter = 0;
+            while (zr * zr + zi * zi <= 4 && iter < MAX_ITERATIONS) {
+                const temp_zr = zr * zr - zi * zi + cr;
+                zi = 2 * zr * zi + ci;
+                zr = temp_zr;
+                iter++;
+            }
+
+            const i = (py * width + px) * 4;
+            if (iter === MAX_ITERATIONS) {
+                pixels[i] = pixels[i + 1] = pixels[i + 2] = 0;
+            } else {
+                const c = (iter / MAX_ITERATIONS) * 255;
+                pixels[i] = c;
+                pixels[i + 1] = c * 0.5;
+                pixels[i + 2] = c * 0.2;
+            }
+            pixels[i + 3] = 255;
+        }
+    }
+
+    ctx.putImageData(imgData, 0, 0);
+}
+
+// Zoom molette : toujours centré sur le milieu de l'image
+canvas.addEventListener('wheel', (e) => {
+    e.preventDefault();
+    zoom *= e.deltaY < 0 ? 1.5 : 1 / 1.5;
+    draw();
+});
+
+// Déplacement par click and drag
+let isDragging = false;
+let lastX = 0;
+let lastY = 0;
+
+canvas.addEventListener('mousedown', (e) => {
+    isDragging = true;
+    lastX = e.clientX;
+    lastY = e.clientY;
+    canvas.style.cursor = 'grabbing';
+});
+
+window.addEventListener('mousemove', (e) => {
+    if (!isDragging) return;
+
+    const rangeY = 2.4 / zoom;
+    const rangeX = rangeY * aspectRatio;
+    centerX -= (e.clientX - lastX) * (rangeX / width);
+    centerY -= (e.clientY - lastY) * (rangeY / height);
+    lastX = e.clientX;
+    lastY = e.clientY;
+
+    draw();
+});
+
+window.addEventListener('mouseup', () => {
+    isDragging = false;
+    canvas.style.cursor = 'grab';
+});
+
+canvas.style.cursor = 'grab';
+draw();
+</script>
+</body>
+</html>
