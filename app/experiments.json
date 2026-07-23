@@ -21,7 +21,7 @@
       "type": "live",
       "entry": "quines/thomas-aquinas.html",
       "language": "html",
-      "image": "screens/thomas-aquinas.svg"
+      "image": "screens/thomas-aquinas.gif"
     },
     {
       "slug": "q-counter",
@@ -34,8 +34,19 @@
       "language": "html"
     },
     {
-      "slug": "first-quine-v1",
+      "slug": "first-quine-v3",
       "category": "quines",
+      "title": "First Quine · 256B",
+      "description": "A quine golfed down to exactly 256 bytes. The idea of self-reproduction compressed as far as it goes.",
+      "tags": ["quine", "code-golf", "256b"],
+      "type": "code-only",
+      "entry": "quines/first-quine-v3.js",
+      "language": "javascript"
+    },
+
+    {
+      "slug": "first-quine-v1",
+      "category": "unremarkable",
       "title": "First Quine · v1",
       "description": "The first, readable JavaScript quine: an array of lines that reprints itself. Where it all started.",
       "tags": ["quine", "javascript"],
@@ -45,7 +56,7 @@
     },
     {
       "slug": "first-quine-v2",
-      "category": "quines",
+      "category": "unremarkable",
       "title": "First Quine · v2",
       "description": "A denser second pass: destructuring, slices and printf formatting let it reproduce itself in fewer lines.",
       "tags": ["quine", "javascript", "code-golf"],
@@ -54,18 +65,8 @@
       "language": "javascript"
     },
     {
-      "slug": "first-quine-v3",
-      "category": "quines",
-      "title": "First Quine · v3 · 256b",
-      "description": "A quine golfed down to exactly 256 bytes. The idea of self-reproduction compressed as far as it goes.",
-      "tags": ["quine", "code-golf", "256b"],
-      "type": "code-only",
-      "entry": "quines/first-quine-v3.js",
-      "language": "javascript"
-    },
-    {
       "slug": "quine-checker",
-      "category": "quines",
+      "category": "unremarkable",
       "title": "Quine Checker",
       "description": "A Node tool: runs a file and verifies it reproduces its own source exactly. The judge of quines.",
       "tags": ["tool", "node"],
@@ -75,7 +76,7 @@
     },
     {
       "slug": "q-quine-checker",
-      "category": "quines",
+      "category": "unremarkable",
       "title": "Quine-Checker Quine",
       "description": "An ongoing challenge: a quine that checks whether a program is a quine. Still a stub — work in progress.",
       "tags": ["quine", "tool", "wip"],

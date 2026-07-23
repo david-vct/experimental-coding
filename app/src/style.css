@@ -1,12 +1,13 @@
 /* ==========================================================================
    experimental-coding · gallery
-   Fond noir, monospace, palette type coloration syntaxique / ANSI. Sobre.
+   Near-black flat backgrounds, monospace, syntax-style palette.
+   Two type sizes only: normal (--fs) and small (--fs-sm).
    ========================================================================== */
 
 :root {
   --bg: #020204;
-  --bg-soft: #08080b;
-  --bg-card: #060608;
+  --bg-soft: #050507;
+  --bg-card: #050506;
   --line: #17171d;
   --line-bright: #262630;
 
@@ -22,8 +23,14 @@
   --magenta: #d2a8ff;
   --cyan: #39c5cf;
 
+  --link: var(--magenta);
+
   --mono: "SFMono-Regular", "JetBrains Mono", "Fira Code", Menlo, Consolas,
     "Liberation Mono", monospace;
+
+  /* the only two type sizes in the whole UI */
+  --fs: 14px;
+  --fs-sm: 10px;
 
   --radius: 4px;
   --maxw: 1100px;
@@ -38,19 +45,15 @@ body {
   background: var(--bg);
   color: var(--fg);
   font-family: var(--mono);
-  font-size: 14px;
+  font-size: var(--fs);
   line-height: 1.55;
   -webkit-font-smoothing: antialiased;
-  /* faint glow at the top, very subtle */
-  background-image:
-    radial-gradient(circle at 50% 0, #0b0b12 0, var(--bg) 55%);
-  background-attachment: fixed;
 }
 
 body.no-scroll { overflow: hidden; }
 
 a {
-  color: var(--blue);
+  color: var(--link);
   text-decoration: none;
   border-bottom: 1px solid transparent;
 }
@@ -70,20 +73,21 @@ a.muted { color: var(--fg-dim); }
 
 .site-head { margin-bottom: 2.5rem; }
 
+/* ASCII banner is art, not text — sized to fit, exempt from the type scale. */
 .ascii-name {
   margin: 0 0 1.5rem;
-  font-size: clamp(4px, 1.35vw, 10px);
+  font-size: var(--fs);
   line-height: 1.15;
   color: var(--green);
   white-space: pre;
-  overflow-x: auto;
+  overflow: hidden;
   text-shadow: 0 0 12px rgba(126, 231, 135, 0.25);
   -webkit-user-select: none;
   user-select: none;
 }
 
 .site-title {
-  font-size: clamp(1.4rem, 4vw, 2.1rem);
+  font-size: var(--fs);
   font-weight: 600;
   letter-spacing: -0.01em;
   margin: 0 0 0.4rem;
@@ -92,13 +96,13 @@ a.muted { color: var(--fg-dim); }
 .site-sub {
   margin: 0;
   color: var(--fg-dim);
-  max-width: 60ch;
+  max-width: 70ch;
 }
 
 .cat { margin-bottom: 3rem; }
 
 .cat-title {
-  font-size: 0.95rem;
+  font-size: var(--fs);
   font-weight: 500;
   color: var(--yellow);
   margin: 0 0 1rem;
@@ -108,7 +112,7 @@ a.muted { color: var(--fg-dim); }
   align-items: baseline;
   gap: 0.5rem;
 }
-.cat-count { color: var(--fg-faint); font-size: 0.8rem; }
+.cat-count { color: var(--fg-faint); font-size: var(--fs-sm); }
 
 .grid {
   display: grid;
@@ -120,7 +124,7 @@ a.muted { color: var(--fg-dim); }
   margin-top: 3rem;
   padding-top: 1rem;
   border-top: 1px solid var(--line);
-  font-size: 0.8rem;
+  font-size: var(--fs);
 }
 
 /* ---------- card -------------------------------------------------------- */
@@ -141,7 +145,7 @@ a.muted { color: var(--fg-dim); }
   transform: translateY(-2px);
   outline: none;
 }
-.card:focus-visible { border-color: var(--blue); }
+.card:focus-visible { border-color: var(--link); }
 
 /* preview area (shared frame) */
 .preview {
@@ -177,7 +181,7 @@ a.muted { color: var(--fg-dim); }
 .preview-code {
   margin: 0;
   padding: 0.75rem 0.9rem;
-  font-size: 11px;
+  font-size: var(--fs-sm);
   line-height: 1.5;
   color: var(--fg-dim);
   white-space: pre;
@@ -191,7 +195,7 @@ a.muted { color: var(--fg-dim); }
   position: absolute;
   right: 0.5rem;
   bottom: 0.4rem;
-  font-size: 10px;
+  font-size: var(--fs-sm);
   color: var(--fg-faint);
   background: var(--bg);
   padding: 1px 6px;
@@ -214,14 +218,14 @@ a.muted { color: var(--fg-dim); }
   gap: 0.5rem;
 }
 .card-title {
-  font-size: 0.95rem;
+  font-size: var(--fs);
   font-weight: 600;
   margin: 0;
   color: var(--fg);
 }
 
 .badge {
-  font-size: 9.5px;
+  font-size: var(--fs-sm);
   text-transform: uppercase;
   letter-spacing: 0.06em;
   padding: 2px 6px;
@@ -230,12 +234,12 @@ a.muted { color: var(--fg-dim); }
   white-space: nowrap;
 }
 .badge--live { color: var(--green); }
-.badge--code-only { color: var(--magenta); }
+.badge--code-only { color: var(--blue); }
 
 .card-desc {
   margin: 0;
   color: var(--fg-dim);
-  font-size: 0.82rem;
+  font-size: var(--fs);
   line-height: 1.5;
   flex: 1;
 }
@@ -248,14 +252,14 @@ a.muted { color: var(--fg-dim); }
   flex-wrap: wrap;
   gap: 0.4rem;
 }
-.tag { color: var(--cyan); font-size: 0.72rem; opacity: 0.8; }
+.tag { color: var(--blue); font-size: var(--fs); opacity: 0.85; }
 
 .card-links {
   display: flex;
   gap: 1rem;
   padding-top: 0.4rem;
   border-top: 1px solid var(--line);
-  font-size: 0.78rem;
+  font-size: var(--fs);
 }
 
 /* ---------- overlay ----------------------------------------------------- */
@@ -298,13 +302,14 @@ a.muted { color: var(--fg-dim); }
 .ov-meta { display: flex; align-items: center; gap: 0.55rem; min-width: 0; }
 .ov-path { color: var(--fg-faint); }
 .ov-title { color: var(--fg); font-weight: 600; }
-.ov-actions { display: flex; align-items: center; gap: 1rem; font-size: 0.82rem; }
+.ov-actions { display: flex; align-items: center; gap: 1rem; font-size: var(--fs); }
 
 .ov-close {
   background: none;
   border: 1px solid var(--line-bright);
   color: var(--fg-dim);
   font-family: var(--mono);
+  font-size: var(--fs-sm);
   cursor: pointer;
   border-radius: 3px;
   width: 26px;
@@ -325,7 +330,7 @@ a.muted { color: var(--fg-dim); }
 .ov-code {
   margin: 0;
   padding: 1.25rem 1.5rem;
-  font-size: 12.5px;
+  font-size: var(--fs);
   line-height: 1.65;
   white-space: pre;
   min-width: max-content;

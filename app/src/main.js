@@ -161,7 +161,7 @@ function gallery() {
       el(
         "p",
         { class: "site-sub" },
-        "Small explorations of programming concepts — quines, fractals, code golf, esolangs. ",
+        "Small explorations of programming concepts: quines, fractals, code golf, esolangs. ",
         el("a", { href: repo, target: "_blank", rel: "noopener" }, "repo ↗"),
       ),
     ),
@@ -189,7 +189,7 @@ function gallery() {
     el(
       "footer",
       { class: "site-foot" },
-      el("span", { class: "comment" }, `// ${experiments.length} experiments · source of truth: monorepo root`),
+      el("span", { class: "comment" }, `// ${experiments.length} experiments · (c) 2026 David Vicente · MIT License`),
     ),
   );
 
