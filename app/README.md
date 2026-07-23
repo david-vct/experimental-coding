@@ -1,9 +1,9 @@
-# app — experimental-coding gallery
+# app - experimental-coding gallery
 
 A web gallery to browse, preview and open the experiments in this monorepo
 (quines, fractals, creative coding, code golf…).
 
-Vanilla JS + Vite, no framework. Near-black background, monospace, syntax-style
+Vanilla JS + Vite. Code styled, monospace, syntax-style
 palette.
 
 ## Run
@@ -17,20 +17,20 @@ npm run preview  # serve dist/
 
 ## How it works
 
-- **`experiments.json`** — curated manifest: title, description, tags, path,
+- **`experiments.json`** - curated manifest: title, description, tags, path,
   language and `type: "live" | "code-only"` for each experiment.
-- **`scripts/sync-experiments.mjs`** — mirrors the experiments from the monorepo
+- **`scripts/sync-experiments.mjs`** - mirrors the experiments from the monorepo
   root into `public/experiments/`. Runs automatically before `dev`
   (`predev`, symlink) and `build` (`prebuild`, copy).
   - **The root stays the single source of truth.** `public/experiments/` is
     generated, never hand-edited, and gitignored.
-- **Isolation** — each experiment loads in its own `<iframe>`: no CSS/JS
+- **Isolation** - each experiment loads in its own `<iframe>`: no CSS/JS
   collision with the gallery.
-- **`type: "live"`** → a scaled, non-interactive iframe thumbnail, then opens
+- **`type: "live"`** - a scaled, non-interactive iframe thumbnail, then opens
   full-size in an in-page overlay.
-- **`type: "code-only"`** → a highlighted source excerpt (home-grown
+- **`type: "code-only"`** - a highlighted source excerpt (home-grown
   highlighter, `src/highlight.js`) plus file/repo links, no execution.
-- **Routing** — state lives in the URL (`#/quines/thomas-aquinas`): shareable,
+- **Routing** - state lives in the URL (`#/quines/thomas-aquinas`): shareable,
   with back-button, `Esc` and click-outside to close.
 - The ASCII name banner at the top is read from `src/ascii-name.txt` (extracted
   from the root `README.md`) and imported raw.
