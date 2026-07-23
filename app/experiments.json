@@ -1,0 +1,87 @@
+{
+  "repo": "https://github.com/david-vct/experimental-coding",
+  "branch": "main",
+  "experiments": [
+    {
+      "slug": "mandelbrot",
+      "category": "fractals",
+      "title": "Mandelbrot",
+      "description": "The Mandelbrot set rendered on a <canvas>, with hand-tuned iteration colouring. Minimal creative coding.",
+      "tags": ["fractal", "canvas", "creative-coding"],
+      "type": "live",
+      "entry": "fractals/mandelbrot.html",
+      "language": "html"
+    },
+    {
+      "slug": "thomas-aquinas",
+      "category": "quines",
+      "title": "Thomas Aquinas",
+      "description": "An animated quine that endlessly rewrites itself while scrolling the Prima Via from the Summa Theologica. Esoteric and contemplative.",
+      "tags": ["quine", "animation", "esoteric"],
+      "type": "live",
+      "entry": "quines/thomas-aquinas.html",
+      "language": "html",
+      "image": "screens/thomas-aquinas.svg"
+    },
+    {
+      "slug": "q-counter",
+      "category": "quines",
+      "title": "Quine Counter",
+      "description": "A quine that prints its own source while incrementing a counter highlighted inside that very source. Pure code golf.",
+      "tags": ["quine", "counter", "code-golf"],
+      "type": "live",
+      "entry": "quines/q-counter.html",
+      "language": "html"
+    },
+    {
+      "slug": "first-quine-v1",
+      "category": "quines",
+      "title": "First Quine · v1",
+      "description": "The first, readable JavaScript quine: an array of lines that reprints itself. Where it all started.",
+      "tags": ["quine", "javascript"],
+      "type": "code-only",
+      "entry": "quines/first-quine-v1.js",
+      "language": "javascript"
+    },
+    {
+      "slug": "first-quine-v2",
+      "category": "quines",
+      "title": "First Quine · v2",
+      "description": "A denser second pass: destructuring, slices and printf formatting let it reproduce itself in fewer lines.",
+      "tags": ["quine", "javascript", "code-golf"],
+      "type": "code-only",
+      "entry": "quines/first-quine-v2.js",
+      "language": "javascript"
+    },
+    {
+      "slug": "first-quine-v3",
+      "category": "quines",
+      "title": "First Quine · v3 · 256b",
+      "description": "A quine golfed down to exactly 256 bytes. The idea of self-reproduction compressed as far as it goes.",
+      "tags": ["quine", "code-golf", "256b"],
+      "type": "code-only",
+      "entry": "quines/first-quine-v3.js",
+      "language": "javascript"
+    },
+    {
+      "slug": "quine-checker",
+      "category": "quines",
+      "title": "Quine Checker",
+      "description": "A Node tool: runs a file and verifies it reproduces its own source exactly. The judge of quines.",
+      "tags": ["tool", "node"],
+      "type": "code-only",
+      "entry": "quines/quine-checker.js",
+      "language": "javascript"
+    },
+    {
+      "slug": "q-quine-checker",
+      "category": "quines",
+      "title": "Quine-Checker Quine",
+      "description": "An ongoing challenge: a quine that checks whether a program is a quine. Still a stub — work in progress.",
+      "tags": ["quine", "tool", "wip"],
+      "type": "code-only",
+      "entry": "quines/q-quine-checker.js",
+      "language": "javascript"
+    }
+  ]
+}
