@@ -11,17 +11,24 @@
   --line: #17171d;
   --line-bright: #262630;
 
-  --fg: #d6d6cf;
-  --fg-dim: #6d6d7a;
-  --fg-faint: #45454f;
+  --fg: #ffffff/* #d6d6cf */;
+  --fg-dim: #ceced6/* #6d6d7a */;
+  --fg-faint: #8d8d97/* #45454f */;
 
   /* ANSI-ish accents */
-  --red: #ff5f56;
+  /* --red: #ff5f56;
   --green: #7ee787;
   --yellow: #f2cc60;
   --blue: #6cb6ff;
   --magenta: #d2a8ff;
-  --cyan: #39c5cf;
+  --cyan: #39c5cf; */
+
+  --red: #ff5f56;
+  --green: #66ff73;
+  --yellow: #ffd562;
+  --blue: #5daeff;
+  --magenta: #cc9dff;
+  --cyan: #37d4df;
 
   --link: var(--magenta);
 

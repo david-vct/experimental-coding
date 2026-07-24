@@ -10,6 +10,7 @@
       "tags": ["fractal", "canvas", "creative-coding"],
       "type": "live",
       "entry": "fractals/mandelbrot.html",
+      "image": "screens/mandelbrot.png",
       "language": "html"
     },
     {
@@ -19,7 +20,7 @@
       "description": "An animated quine that endlessly rewrites itself while scrolling the Prima Via from the Summa Theologica. Esoteric and contemplative.",
       "tags": ["quine", "animation", "esoteric"],
       "type": "live",
-      "entry": "quines/thomas-aquinas.html",
+      "entry": "quines/thomas-aquinas-v2.html",
       "language": "html",
       "image": "screens/thomas-aquinas.gif"
     },
@@ -31,7 +32,8 @@
       "tags": ["quine", "counter", "code-golf"],
       "type": "live",
       "entry": "quines/q-counter.html",
-      "language": "html"
+      "language": "html",
+      "image": "screens/q-counter.gif"
     },
     {
       "slug": "first-quine-v3",
