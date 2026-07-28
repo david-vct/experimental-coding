@@ -20,7 +20,7 @@
       "description": "An animated quine that endlessly rewrites itself while scrolling the Prima Via from the Summa Theologica. Esoteric and contemplative.",
       "tags": ["quine", "animation", "esoteric"],
       "type": "live",
-      "entry": "quines/thomas-aquinas-v2.html",
+      "entry": "quines/thomas-aquinas-v3.html",
       "language": "html",
       "image": "screens/thomas-aquinas.gif"
     },
