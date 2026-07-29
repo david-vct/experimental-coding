@@ -89,8 +89,6 @@ a.muted { color: var(--fg-dim); }
   white-space: pre;
   overflow: hidden;
   text-shadow: 0 0 12px rgba(126, 231, 135, 0.25);
-  -webkit-user-select: none;
-  user-select: none;
 }
 
 .site-title {
