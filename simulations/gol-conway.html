@@ -758,6 +758,14 @@ renderRule();
 el("dims").textContent = COLS + "×" + ROWS;
 el("speed-val").textContent = speed + " gen/s";
 randomise();
+
+/* Optional boot state from the query string, so an embedder (the gallery card)
+   can show something better than frozen noise: ?scene=zoo|gun, ?autoplay. */
+const boot = new URLSearchParams(location.search);
+if (boot.get("scene") === "zoo") loadScene(ZOO, true);
+else if (boot.get("scene") === "gun") loadScene(GUNS, false);
+if (boot.has("autoplay")) setRunning(true);
+
 new ResizeObserver(resize).observe(canvas.parentElement);
 resize();
 requestAnimationFrame(frame);

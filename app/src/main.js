@@ -28,6 +28,10 @@ const el = (tag, attrs = {}, ...children) => {
 };
 
 const assetUrl = (entry) => `${BASE}experiments/${entry}`;
+// Card thumbnails may boot an experiment in a specific state (e.g. an
+// auto-playing scene for the simulations) via an optional query string.
+const previewUrl = (exp) =>
+  assetUrl(exp.entry) + (exp.previewParams ? `?${exp.previewParams}` : "");
 const staticUrl = (path) => `${BASE}${path}`;
 const repoUrl = (entry) => `${repo}/blob/${branch}/${entry}`;
 const idOf = (exp) => `${exp.category}/${exp.slug}`;
@@ -85,7 +89,7 @@ function previewNode(exp) {
       "aria-hidden": "true",
       scrolling: "no",
     });
-    frame.dataset.src = assetUrl(exp.entry);
+    frame.dataset.src = previewUrl(exp);
     lazyIframes.observe(frame);
     return el("div", { class: "preview preview--live" }, frame);
   }

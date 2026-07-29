@@ -3,16 +3,30 @@
   "branch": "main",
   "experiments": [
     {
-      "slug": "mandelbrot",
-      "category": "fractals",
-      "title": "Mandelbrot",
-      "description": "The Mandelbrot set rendered on a <canvas>, with hand-tuned iteration colouring. Minimal creative coding.",
-      "tags": ["fractal", "canvas", "creative-coding"],
+      "slug": "gol-conway",
+      "category": "simulations",
+      "title": "Conway · Game of Life",
+      "description": "The classic B3/S23 life on a 96×64 lattice: editable cells, tunable birth/survival rules, torus wrapping, and a zoo of verified patterns (still lifes, oscillators, spaceships) plus a glider gun.",
+      "tags": ["cellular-automata", "interactive"],
       "type": "live",
-      "entry": "fractals/mandelbrot.html",
-      "image": "screens/mandelbrot.png",
-      "language": "html"
+      "entry": "simulations/gol-conway.html",
+      "previewParams": "scene=gun&autoplay",
+      "language": "html",
+      "image":"screens/gol-conway.gif"
     },
+    {
+      "slug": "gol-hexalife",
+      "category": "simulations",
+      "title": "HexaLife · Game of Life",
+      "description": "Life on a hexagonal lattice, where each cell has 6 neighbours instead of 8. B2/S34 is the interesting rule here — no spaceships exist, only still lifes and oscillators, hand-packed into a loadable zoo.",
+      "tags": ["cellular-automata", "interactive"],
+      "type": "live",
+      "entry": "simulations/gol-hexalife.html",
+      "previewParams": "scene=zoo&autoplay",
+      "language": "html",
+      "image":"screens/gol-hexalife.gif"
+    },
+
     {
       "slug": "thomas-aquinas",
       "category": "quines",
@@ -44,6 +58,18 @@
       "type": "code-only",
       "entry": "quines/first-quine-v3.js",
       "language": "javascript"
+    },
+
+    {
+      "slug": "mandelbrot",
+      "category": "fractals",
+      "title": "Mandelbrot",
+      "description": "The Mandelbrot set rendered on a <canvas>, with hand-tuned iteration colouring. Minimal creative coding.",
+      "tags": ["fractal", "canvas", "creative-coding"],
+      "type": "live",
+      "entry": "fractals/mandelbrot.html",
+      "image": "screens/mandelbrot.png",
+      "language": "html"
     },
 
     {

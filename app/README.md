@@ -49,6 +49,20 @@ the card thumbnail. Clicking the card still opens the real running program in
 the overlay. Screenshots live in `public/screens/` (committed, unlike the
 generated mirror).
 
+## Card thumbnails: booting a live preview in a given state
+
+Some `live` experiments start idle (the simulations boot paused on random
+noise), which makes a dull thumbnail. An optional `previewParams` field is
+appended as a query string to the **card iframe only** — the overlay and the
+`open ↗` link still load the experiment untouched:
+
+```json
+{ "slug": "gol-conway", "type": "live", "previewParams": "scene=gun&autoplay" }
+```
+
+The experiment decides what those params mean. Both Games of Life read
+`?scene=` (`zoo` / `gun`) and `?autoplay` at boot.
+
 ## Add an experiment
 
 1. Add the file at the monorepo root (`fractals/`, `quines/`, …).
