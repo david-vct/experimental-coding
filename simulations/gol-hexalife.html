@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>hexa-conway</title>
+<style>
+  :root {
+    --bg: #020204;
+    --bg-soft: #050507;
+    --line: #17171d;
+    --line-bright: #262630;
+
+    --fg: #ffffff;
+    --fg-dim: #ceced6;
+    --fg-faint: #8d8d97;
+
+    --red: #ff5f56;
+    --green: #66ff73;
+    --yellow: #ffd562;
+    --blue: #5daeff;
+    --magenta: #cc9dff;
+    --cyan: #37d4df;
+
+    --mono: "SFMono-Regular", "JetBrains Mono", "Fira Code", Menlo, Consolas,
+      "Liberation Mono", monospace;
+
+    --fs: 14px;
+    --fs-sm: 10px;
+    --radius: 4px;
+  }
+
+  * { box-sizing: border-box; }
+  html { color-scheme: dark; }
+
+  body {
+    margin: 0;
+    height: 100vh;
+    background: var(--bg);
+    color: var(--fg);
+    font-family: var(--mono);
+    font-size: var(--fs);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    display: flex;
+    overflow: hidden;
+  }
+
+  /* ---------- panel ---------------------------------------------------- */
+
+  .panel {
+    width: 260px;
+    flex: none;
+    border-right: 1px solid var(--line);
+    background: var(--bg-soft);
+    padding: 1rem 1rem 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    overflow-y: auto;
+  }
+
+  .title { font-size: var(--fs); font-weight: 600; margin: 0; }
+  .title .prompt { color: var(--green); }
+  .sub { margin: 0.15rem 0 0; color: var(--fg-faint); font-size: var(--fs-sm); }
+
+  .block { display: flex; flex-direction: column; gap: 0.5rem; }
+
+  .label {
+    font-size: var(--fs-sm);
+    text-transform: uppercase;
+    letter-spacing: 0.09em;
+    color: var(--yellow);
+    padding-bottom: 0.35rem;
+    border-bottom: 1px solid var(--line);
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 0.5rem;
+  }
+  .label .val { color: var(--fg-faint); letter-spacing: 0; text-transform: none; }
+
+  .row { display: flex; gap: 0.4rem; }
+
+  button {
+    font-family: var(--mono);
+    font-size: var(--fs-sm);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--fg-dim);
+    background: transparent;
+    border: 1px solid var(--line-bright);
+    border-radius: var(--radius);
+    padding: 0.4rem 0.5rem;
+    cursor: pointer;
+    transition: color 0.12s ease, border-color 0.12s ease;
+    white-space: nowrap;
+  }
+  button:hover { color: var(--fg); border-color: var(--fg-faint); }
+  button:focus-visible { outline: 1px solid var(--blue); outline-offset: 1px; }
+
+  .btn-wide { flex: 1; }
+  .btn-run.on { color: var(--red); border-color: var(--red); }
+  .btn-run.off { color: var(--green); border-color: var(--green); }
+
+  /* rule bits: 0..6 toggles */
+  .bits { display: grid; grid-template-columns: repeat(7, 1fr); gap: 0.25rem; }
+  .bit { padding: 0.35rem 0; text-align: center; }
+  .bit.on { color: var(--magenta); border-color: var(--magenta); }
+  .rule-str { color: var(--fg-faint); font-size: var(--fs-sm); }
+  .rule-str b { color: var(--blue); font-weight: 400; }
+
+  input[type="range"] {
+    width: 100%;
+    accent-color: var(--magenta);
+    background: transparent;
+    margin: 0;
+  }
+
+  .check {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--fg-dim);
+    font-size: var(--fs-sm);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    cursor: pointer;
+    user-select: none;
+  }
+  .check input { accent-color: var(--magenta); margin: 0; }
+
+  .stats { display: flex; flex-direction: column; gap: 0.15rem; color: var(--fg-dim); font-size: var(--fs-sm); }
+  .stats span { color: var(--blue); }
+
+  .keys { margin-top: auto; color: var(--fg-faint); font-size: var(--fs-sm); line-height: 1.7; }
+  .keys kbd {
+    font: inherit;
+    color: var(--fg-dim);
+    border: 1px solid var(--line-bright);
+    border-radius: 3px;
+    padding: 0 4px;
+  }
+
+  /* ---------- stage ---------------------------------------------------- */
+
+  .stage {
+    flex: 1;
+    min-width: 0;
+    position: relative;
+    background: #000;
+  }
+  canvas { display: block; width: 100%; height: 100%; cursor: crosshair; }
+
+  @media (max-width: 720px) {
+    body { flex-direction: column; overflow: auto; }
+    .panel { width: 100%; border-right: 0; border-bottom: 1px solid var(--line); }
+    .stage { height: 70vh; flex: none; }
+  }
+</style>
+</head>
+<body>
+
+<aside class="panel">
+  <header>
+    <h1 class="title"><span class="prompt">&gt;</span> hexa-life</h1>
+    <p class="sub">Game of Life on a hexagonal grid</p>
+  </header>
+
+  <section class="block">
+    <div class="label">transport</div>
+    <div class="row">
+      <button id="btn-run" class="btn-wide btn-run off">> run</button>
+      <button id="btn-step" class="btn-wide">-> step</button>
+    </div>
+    <div class="row">
+      <button id="btn-reset" class="btn-wide">|&lt; restart</button>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="label">speed <span class="val" id="speed-val">10 gen/s</span></div>
+    <input type="range" id="speed" min="1" max="60" step="1" value="10">
+  </section>
+
+  <section class="block">
+    <div class="label">born <span class="val">neighbours</span></div>
+    <div class="bits" id="bits-born"></div>
+    <div class="label" style="margin-top:0.35rem">survive <span class="val">neighbours</span></div>
+    <div class="bits" id="bits-survive"></div>
+    <div class="rule-str">rule &middot; <b id="rule-str">B2/S34</b></div>
+  </section>
+
+  <section class="block">
+    <div class="label">grid <span class="val" id="dims"></span></div>
+    <div class="row">
+      <button id="btn-random" class="btn-wide">random</button>
+      <button id="btn-clear" class="btn-wide">clear</button>
+    </div>
+    <div class="row">
+      <button id="btn-zoo" class="btn-wide">zoo &middot; b2/s34</button>
+    </div>
+    <label class="check"><input type="checkbox" id="wrap" checked> wrap edges (torus)</label>
+  </section>
+
+  <section class="block">
+    <div class="label">state</div>
+    <div class="stats">
+      <div>gen &nbsp;<span id="stat-gen">0</span></div>
+      <div>pop &nbsp;<span id="stat-pop">0</span></div>
+    </div>
+  </section>
+
+  <footer class="keys">
+    <kbd>space</kbd> run/stop &middot; <kbd>n</kbd> step<br>
+    <kbd>r</kbd> restart &middot; <kbd>c</kbd> clear<br>
+    <kbd>g</kbd> random &middot; <kbd>z</kbd> zoo<br>
+    click / drag a cell to toggle it
+  </footer>
+</aside>
+
+<div class="stage">
+  <canvas id="canvas"></canvas>
+</div>
+
+<script>
+"use strict";
+
+/* =======================================================================
+   Grid model — "odd-r" offset layout of pointy-top hexagons.
+   Odd rows are shifted right by half a cell, so the neighbour offsets
+   differ per row parity:
+     even row (not shifted):  E W NW NE(=N above-left/right shifted left)
+     odd  row (shifted right)
+   ======================================================================= */
+
+const COLS = 56;
+const ROWS = 44; // even, so vertical wrapping preserves row parity
+
+const NEIGHBOURS = [
+  // even rows: the row above/below sits half a cell to the RIGHT of ours,
+  // so its cells covering us are at dx = -1 and dx = 0
+  [[+1, 0], [-1, 0], [0, -1], [-1, -1], [0, +1], [-1, +1]],
+  // odd rows: shifted right, so the neighbouring rows are at dx = 0 and +1
+  [[+1, 0], [-1, 0], [0, -1], [+1, -1], [0, +1], [+1, +1]],
+];
+
+let grid = new Uint8Array(COLS * ROWS);
+let seed = new Uint8Array(COLS * ROWS); // generation-0 snapshot, for restart
+let next = new Uint8Array(COLS * ROWS);
+
+let born = new Set([2]);
+let survive = new Set([3, 4]);
+let wrap = true;
+
+let generation = 0;
+let running = false;
+let speed = 10; // generations per second
+
+const at = (x, y) => y * COLS + x;
+
+function countAliveNeighbours(x, y) {
+  let count = 0;
+  for (const [dx, dy] of NEIGHBOURS[y & 1]) {
+    let nx = x + dx;
+    let ny = y + dy;
+    if (wrap) {
+      nx = (nx + COLS) % COLS;
+      ny = (ny + ROWS) % ROWS;
+    } else if (nx < 0 || nx >= COLS || ny < 0 || ny >= ROWS) {
+      continue;
+    }
+    count += grid[at(nx, ny)];
+  }
+  return count;
+}
+
+function stepGeneration() {
+  for (let y = 0; y < ROWS; y++) {
+    for (let x = 0; x < COLS; x++) {
+      const i = at(x, y);
+      const n = countAliveNeighbours(x, y);
+      next[i] = grid[i] ? (survive.has(n) ? 1 : 0) : (born.has(n) ? 1 : 0);
+    }
+  }
+  const swap = grid;
+  grid = next;
+  next = swap;
+  generation++;
+  renderStats();
+}
+
+function randomise(density = 0.18) {
+  for (let i = 0; i < grid.length; i++) grid[i] = Math.random() < density ? 1 : 0;
+  commitSeed();
+}
+
+function clearGrid() {
+  grid.fill(0);
+  commitSeed();
+}
+
+/** Freeze the current grid as generation 0. */
+function commitSeed() {
+  seed.set(grid);
+  generation = 0;
+  renderStats();
+}
+
+function restart() {
+  grid.set(seed);
+  generation = 0;
+  renderStats();
+  draw();
+}
+
+/* =======================================================================
+   Geometry — pointy-top hexagon of circumradius R:
+     width  = sqrt(3) * R      (horizontal step between columns)
+     height = 2 * R
+     row step = 1.5 * R        (rows interlock by a quarter height)
+   ======================================================================= */
+
+const SQRT3 = Math.sqrt(3);
+
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+const lineLayer = document.createElement("canvas"); // static 1px lattice
+const lineCtx = lineLayer.getContext("2d");
+
+let R = 8;          // hex circumradius, in CSS px
+let originX = 0;    // top-left of the lattice bounding box
+let originY = 0;
+let dpr = 1;
+
+function hexCenter(x, y) {
+  const w = SQRT3 * R;
+  return [
+    originX + (x + (y & 1 ? 0.5 : 0)) * w + w / 2,
+    originY + y * 1.5 * R + R,
+  ];
+}
+
+function hexPath(path, cx, cy) {
+  for (let i = 0; i < 6; i++) {
+    const a = Math.PI / 6 + i * Math.PI / 3; // 30° offset ⇒ pointy top
+    const px = cx + R * Math.cos(a);
+    const py = cy + R * Math.sin(a);
+    if (i === 0) path.moveTo(px, py); else path.lineTo(px, py);
+  }
+  path.closePath();
+}
+
+function resize() {
+  const rect = canvas.getBoundingClientRect();
+  dpr = window.devicePixelRatio || 1;
+  const w = Math.max(1, Math.floor(rect.width));
+  const h = Math.max(1, Math.floor(rect.height));
+
+  for (const c of [canvas, lineLayer]) {
+    c.width = Math.floor(w * dpr);
+    c.height = Math.floor(h * dpr);
+  }
+  for (const c of [ctx, lineCtx]) {
+    c.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+
+  // largest R that fits the whole lattice, with a small margin
+  const pad = 8;
+  R = Math.min(
+    (w - 2 * pad) / (SQRT3 * (COLS + 0.5)),
+    (h - 2 * pad) / (1.5 * ROWS + 0.5)
+  );
+
+  const gridW = SQRT3 * (COLS + 0.5) * R;
+  const gridH = (1.5 * ROWS + 0.5) * R;
+  originX = (w - gridW) / 2;
+  originY = (h - gridH) / 2;
+
+  buildLineLayer();
+  draw();
+}
+
+/** The lattice outline never changes — rasterise it once. */
+function buildLineLayer() {
+  const path = new Path2D();
+  for (let y = 0; y < ROWS; y++) {
+    for (let x = 0; x < COLS; x++) {
+      const [cx, cy] = hexCenter(x, y);
+      hexPath(path, cx, cy);
+    }
+  }
+  lineCtx.clearRect(0, 0, lineLayer.width, lineLayer.height);
+  lineCtx.strokeStyle = "#333333";
+  lineCtx.lineWidth = 1 / dpr; // exactly one device pixel
+  lineCtx.stroke(path);
+}
+
+function draw() {
+  const w = canvas.width / dpr;
+  const h = canvas.height / dpr;
+  ctx.clearRect(0, 0, w, h);
+
+  const alive = new Path2D();
+  for (let y = 0; y < ROWS; y++) {
+    for (let x = 0; x < COLS; x++) {
+      if (!grid[at(x, y)]) continue;
+      const [cx, cy] = hexCenter(x, y);
+      hexPath(alive, cx, cy);
+    }
+  }
+  ctx.fillStyle = "white";
+  ctx.fill(alive);
+
+  ctx.save();
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  ctx.drawImage(lineLayer, 0, 0);
+  ctx.restore();
+}
+
+/* =======================================================================
+   Pointer picking — invert the layout approximately, then pick the
+   nearest centre among the candidate cells.
+   ======================================================================= */
+
+function cellAt(px, py) {
+  const w = SQRT3 * R;
+  const ry = Math.floor((py - originY - R) / (1.5 * R));
+  let best = null;
+  let bestDist = Infinity;
+  for (let y = ry - 1; y <= ry + 1; y++) {
+    if (y < 0 || y >= ROWS) continue;
+    const rx = Math.floor((px - originX - w / 2) / w - (y & 1 ? 0.5 : 0));
+    for (let x = rx - 1; x <= rx + 1; x++) {
+      if (x < 0 || x >= COLS) continue;
+      const [cx, cy] = hexCenter(x, y);
+      const d = (px - cx) ** 2 + (py - cy) ** 2;
+      if (d < bestDist) { bestDist = d; best = [x, y]; }
+    }
+  }
+  return best && bestDist <= R * R ? best : null;
+}
+
+let painting = 0;      // value being painted while dragging
+let paintActive = false;
+let lastPainted = -1;
+
+function pointerPos(e) {
+  const rect = canvas.getBoundingClientRect();
+  return [e.clientX - rect.left, e.clientY - rect.top];
+}
+
+function paintAt(e, toggle) {
+  const cell = cellAt(...pointerPos(e));
+  if (!cell) return;
+  const i = at(cell[0], cell[1]);
+  if (i === lastPainted) return;
+  lastPainted = i;
+  if (toggle) painting = grid[i] ? 0 : 1;
+  grid[i] = painting;
+  if (generation === 0) seed.set(grid); // editing at gen 0 redefines the seed
+  renderStats();
+  draw();
+}
+
+canvas.addEventListener("pointerdown", (e) => {
+  paintActive = true;
+  lastPainted = -1;
+  canvas.setPointerCapture(e.pointerId);
+  paintAt(e, true);
+});
+canvas.addEventListener("pointermove", (e) => {
+  if (paintActive) paintAt(e, false);
+});
+for (const ev of ["pointerup", "pointercancel"]) {
+  canvas.addEventListener(ev, () => { paintActive = false; lastPainted = -1; });
+}
+
+/* =======================================================================
+   Controls
+   ======================================================================= */
+
+const el = (id) => document.getElementById(id);
+const btnRun = el("btn-run");
+const ruleStr = el("rule-str");
+
+function setRunning(v) {
+  running = v;
+  btnRun.classList.toggle("on", v);
+  btnRun.classList.toggle("off", !v);
+  btnRun.innerHTML = v ? "&#10073;&#10073; stop" : "&#9654; run";
+  accumulator = 0;
+  last = performance.now();
+}
+
+function buildBits(containerId, set) {
+  const container = el(containerId);
+  container.innerHTML = "";
+  for (let n = 0; n <= 6; n++) {
+    const b = document.createElement("button");
+    b.className = "bit" + (set.has(n) ? " on" : "");
+    b.textContent = n;
+    b.addEventListener("click", () => {
+      if (set.has(n)) set.delete(n); else set.add(n);
+      b.classList.toggle("on", set.has(n));
+      renderRule();
+    });
+    container.appendChild(b);
+  }
+}
+
+function renderRule() {
+  const fmt = (s) => [...s].sort((a, b) => a - b).join("") || "-";
+  ruleStr.textContent = `B${fmt(born)}/S${fmt(survive)}`;
+}
+
+function renderStats() {
+  let pop = 0;
+  for (let i = 0; i < grid.length; i++) pop += grid[i];
+  el("stat-gen").textContent = generation;
+  el("stat-pop").textContent = pop;
+}
+
+btnRun.addEventListener("click", () => setRunning(!running));
+el("btn-step").addEventListener("click", () => { setRunning(false); stepGeneration(); draw(); });
+el("btn-reset").addEventListener("click", () => { setRunning(false); restart(); });
+el("btn-random").addEventListener("click", () => { randomise(); draw(); });
+el("btn-clear").addEventListener("click", () => { clearGrid(); draw(); });
+el("wrap").addEventListener("change", (e) => { wrap = e.target.checked; });
+el("speed").addEventListener("input", (e) => {
+  speed = +e.target.value;
+  el("speed-val").textContent = speed + " gen/s";
+});
+
+document.addEventListener("keydown", (e) => {
+  if (e.target.tagName === "INPUT") return;
+  switch (e.key) {
+    case " ": e.preventDefault(); setRunning(!running); break;
+    case "n": setRunning(false); stepGeneration(); draw(); break;
+    case "r": setRunning(false); restart(); break;
+    case "c": clearGrid(); draw(); break;
+    case "g": randomise(); draw(); break;
+  }
+});
+
+/* =======================================================================
+   Loop
+   ======================================================================= */
+
+let last = performance.now();
+let accumulator = 0;
+
+function frame(now) {
+  const dt = now - last;
+  last = now;
+  if (running) {
+    accumulator += dt;
+    const interval = 1000 / speed;
+    let budget = 8; // never spiral after a background tab pause
+    while (accumulator >= interval && budget-- > 0) {
+      accumulator -= interval;
+      stepGeneration();
+    }
+    if (accumulator > interval) accumulator = 0;
+    draw();
+  }
+  requestAnimationFrame(frame);
+}
+
+buildBits("bits-born", born);
+buildBits("bits-survive", survive);
+renderRule();
+el("dims").textContent = COLS + "×" + ROWS;
+el("speed-val").textContent = speed + " gen/s";
+randomise();
+new ResizeObserver(resize).observe(canvas.parentElement);
+resize();
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>
