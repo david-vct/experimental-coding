@@ -70,6 +70,11 @@ a.muted { color: var(--fg-dim); }
 .comment { color: var(--fg-faint); }
 .prompt { color: var(--green); }
 
+::selection {
+  color: black;
+  background: var(--yellow);
+}
+
 /* ---------- layout ------------------------------------------------------ */
 
 #app {
