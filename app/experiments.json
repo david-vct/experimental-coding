@@ -75,10 +75,20 @@
       "slug": "meta-glyph-depth",
       "category": "visuals",
       "title": "Meta Glyph Depth",
-      "description": "A hand-drawn FIGlet face whose letters are built out of the very ASCII characters they are made to print. Typography folding back on itself.",
+      "description": "A hand-drawn FIGlet face whose letters are built out of the very ASCII characters they are made to print.",
       "tags": ["ascii-art", "typography", "figlet"],
       "type": "live",
       "entry": "art/meta-glyph-depth.html",
+      "language": "html"
+    },
+    {
+      "slug": "ascii-loader",
+      "category": "visuals",
+      "title": "ASCII Loader",
+      "description": "A six-frame loading spinner drawn as a FIGlet font: each digit 0-5 is a frame of the animation.",
+      "tags": ["ascii-art", "animation", "figlet"],
+      "type": "live",
+      "entry": "art/ascii-loader.html",
       "language": "html"
     },
 

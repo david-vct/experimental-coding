@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meta Glyph Depth</title>
+    <script src="https://cdn.jsdelivr.net/npm/figlet@1.7.0/lib/figlet.js"></script>
+    <style>
+        :root { color-scheme: dark; }
+        html, body {
+            height: 100%;
+            margin: 0;
+            background: #010105;
+            color: #a2a2bb;
+        }
+        body {
+            display: grid;
+            place-content: center;
+            overflow: hidden;
+            font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+        }
+        pre {
+            margin: 0;
+            font: inherit;
+            font-size: 16px;
+            line-height: 1;
+            letter-spacing: 0;
+            white-space: pre;
+            text-shadow: 0 0 12px rgba(120, 140, 255, 0.18);
+        }
+        .err { color: #b45; font-size: 13px; }
+    </style>
+</head>
+
+<body>
+
+<pre></pre>
+
+<script>
+// Renders the whole printable range of meta-glyph-depth.flf — a 7-row FIGlet
+// face whose glyphs are themselves drawn out of ASCII box/brace characters.
+(async () => {
+    const fontName = "ascii-loader";
+    const pre = document.querySelector("pre");
+    const loaderTexts = []
+
+    // Load font file
+    try {
+        const res = await fetch(`./${fontName}.flf`);
+        if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
+        figlet.parseFont(fontName, await res.text());
+    
+        for (let i = 0; i < 6; i++) {
+            const art = await new Promise((ok, ko) =>
+                figlet.text(i, { font: fontName }, (err, data) => (err ? ko(err) : ok(data))),
+            );
+            loaderTexts.push(art);
+        }
+    } catch (e) {
+        console.error(e);
+    }
+
+    // Scale the type so the full character set always fills the viewport,
+    // whether that viewport is a fullscreen tab or a small gallery thumbnail.
+    function fit(pre) {
+        pre.style.fontSize = "16px";
+        const { scrollWidth: w, scrollHeight: h } = pre;
+        if (!w || !h) return;
+        const scale = Math.min(innerWidth / w, innerHeight / h) * 0.92;
+        pre.style.fontSize = `${16 * scale}px`;
+    }
+
+    //fit(pre);
+    //addEventListener("resize", () => fit(pre));
+
+    function renderStep(step) {
+            pre.textContent = loaderTexts[step];
+            //fit(pre);
+            setTimeout(() => renderStep((step + 1)%6), 100);
+    }
+
+    renderStep(0);
+})();
+</script>
+
+</body>
+</html>
