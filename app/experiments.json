@@ -62,13 +62,23 @@
 
     {
       "slug": "mandelbrot",
-      "category": "fractals",
+      "category": "visuals",
       "title": "Mandelbrot",
       "description": "The Mandelbrot set with hand-tuned iteration colouring.",
       "tags": ["fractal", "canvas"],
       "type": "live",
       "entry": "fractals/mandelbrot.html",
       "image": "screens/mandelbrot.png",
+      "language": "html"
+    },
+    {
+      "slug": "meta-glyph-depth",
+      "category": "visuals",
+      "title": "Meta Glyph Depth",
+      "description": "A hand-drawn FIGlet face whose letters are built out of the very ASCII characters they are made to print. Typography folding back on itself.",
+      "tags": ["ascii-art", "typography", "figlet"],
+      "type": "live",
+      "entry": "art/meta-glyph-depth.html",
       "language": "html"
     },
 

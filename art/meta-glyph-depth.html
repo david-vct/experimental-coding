@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meta Glyph Depth</title>
+    <script src="https://cdn.jsdelivr.net/npm/figlet@1.7.0/lib/figlet.js"></script>
+    <style>
+        :root { color-scheme: dark; }
+        html, body {
+            height: 100%;
+            margin: 0;
+            background: #010105;
+            color: #a2a2bb;
+        }
+        body {
+            display: grid;
+            place-content: center;
+            overflow: hidden;
+            font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+        }
+        pre {
+            margin: 0;
+            font: inherit;
+            font-size: 16px;
+            line-height: 1;
+            letter-spacing: 0;
+            white-space: pre;
+            text-shadow: 0 0 12px rgba(120, 140, 255, 0.18);
+        }
+        .err { color: #b45; font-size: 13px; }
+    </style>
+</head>
+
+<body>
+
+<script>
+// Renders the whole printable range of meta-glyph-depth.flf — a 7-row FIGlet
+// face whose glyphs are themselves drawn out of ASCII box/brace characters.
+(async () => {
+    const FONT = "meta-glyph-depth";
+    const TEXT = "0123456789\nABCDEFGHIJKLM\nNOPQRSTUVWXYZ\n.,:\\+-=";
+
+    const show = (node) => { document.body.replaceChildren(node); };
+
+    try {
+        const res = await fetch(`./${FONT}.flf`);
+        if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
+        figlet.parseFont(FONT, await res.text());
+
+        const art = await new Promise((ok, ko) =>
+            figlet.text(TEXT, { font: FONT }, (err, data) => (err ? ko(err) : ok(data))),
+        );
+
+        const pre = document.createElement("pre");
+        pre.textContent = art;
+        show(pre);
+        fit(pre);
+        addEventListener("resize", () => fit(pre));
+    } catch (e) {
+        const p = document.createElement("p");
+        p.className = "err";
+        p.textContent = `failed to render: ${e.message}`;
+        show(p);
+        console.error(e);
+    }
+
+    // Scale the type so the full character set always fills the viewport,
+    // whether that viewport is a fullscreen tab or a small gallery thumbnail.
+    function fit(pre) {
+        pre.style.fontSize = "16px";
+        const { scrollWidth: w, scrollHeight: h } = pre;
+        if (!w || !h) return;
+        const scale = Math.min(innerWidth / w, innerHeight / h) * 0.92;
+        pre.style.fontSize = `${16 * scale}px`;
+    }
+})();
+</script>
+
+</body>
+</html>
