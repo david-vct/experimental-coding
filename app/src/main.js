@@ -4,7 +4,7 @@ import { highlightJs } from "./highlight.js";
 import asciiName from "./ascii-name.txt?raw";
 
 const BASE = import.meta.env.BASE_URL; // "./" — relative, host-agnostic
-const { repo, branch, experiments } = manifest;
+const { repo, me, branch, experiments } = manifest;
 
 const bySlug = new Map(experiments.map((e) => [`${e.category}/${e.slug}`, e]));
 
@@ -167,6 +167,8 @@ function gallery() {
         { class: "site-sub" },
         "Small explorations of programming concepts: quines, fractals, code golf, esolangs. ",
         el("a", { href: repo, target: "_blank", rel: "noopener" }, "repo ↗"),
+        " · ",
+        el("a", { href: me, target: "_blank", rel: "noopener" }, "me ↗"),
       ),
     ),
   );
