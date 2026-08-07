@@ -130,6 +130,45 @@ a.muted { color: var(--fg-dim); }
   gap: 1rem;
 }
 
+/* Folded sections: a bare command line rather than a UI button. */
+.load-more {
+  display: block;
+  width: 100%;
+  margin-top: 1rem;
+  padding: 0.6rem 0.9rem;
+  background: transparent;
+  border: 1px dashed var(--line-bright);
+  border-radius: var(--radius);
+  color: var(--fg-dim);
+  font-family: var(--mono);
+  font-size: var(--fs);
+  line-height: 1.55;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.15s ease, color 0.15s ease, background 0.15s ease;
+}
+.load-more:hover,
+.load-more:focus-visible {
+  border-style: solid;
+  border-color: var(--line-bright);
+  background: var(--bg-card);
+  color: var(--fg);
+  outline: none;
+}
+.load-more:focus-visible { border-color: var(--link); }
+.load-more:active { transform: translateY(1px); }
+.load-more::after {
+  content: "_";
+  color: var(--green);
+  opacity: 0;
+}
+.load-more:hover::after,
+.load-more:focus-visible::after {
+  opacity: 1;
+  animation: caret 1s steps(1, end) infinite;
+}
+@keyframes caret { 50% { opacity: 0; } }
+
 .site-foot {
   margin-top: 3rem;
   padding-top: 1rem;

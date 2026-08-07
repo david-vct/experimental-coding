@@ -152,6 +152,54 @@ function card(exp) {
 
 /* ---------- gallery layout --------------------------------------------- */
 
+// Sections start folded to PAGE cards and grow PAGE at a time.
+const PAGE = 3;
+
+function section(cat, items) {
+  const count = el("span", { class: "cat-count" });
+  const grid = el("div", { class: "grid" });
+  const cmd = el("span");
+  const left = el("span", { class: "comment" });
+  const more = el(
+    "button",
+    { class: "load-more", type: "button", onclick: () => expand() },
+    el("span", { class: "prompt" }, "$ "),
+    cmd,
+    " ",
+    //left,
+  );
+
+  let shown = 0;
+  let exhausted = false;
+
+  function expand() {
+    const batch = items.slice(shown, shown + PAGE).map(card);
+    grid.append(...batch);
+    shown += batch.length;
+
+    const remaining = items.length - shown;
+    count.textContent = `(${shown}/${items.length})`;
+    cmd.textContent = `load more`;
+    left.textContent = `// ${remaining} left`;
+
+    if (remaining === 0) {
+      exhausted = true;
+      const wasFocused = more.contains(document.activeElement);
+      more.remove();
+      if (wasFocused && batch[0]) batch[0].focus(); // don't drop keyboard focus
+    }
+  }
+  expand();
+
+  return el(
+    "section",
+    { class: "cat" },
+    el("h2", { class: "cat-title" }, el("span", { class: "comment" }, "// "), cat, count),
+    grid,
+    !exhausted && more,
+  );
+}
+
 function gallery() {
   const categories = [...new Set(experiments.map((e) => e.category))];
   const frag = document.createDocumentFragment();
@@ -176,21 +224,7 @@ function gallery() {
   );
 
   for (const cat of categories) {
-    const items = experiments.filter((e) => e.category === cat);
-    frag.append(
-      el(
-        "section",
-        { class: "cat" },
-        el(
-          "h2",
-          { class: "cat-title" },
-          el("span", { class: "comment" }, "// "),
-          cat,
-          el("span", { class: "cat-count" }, `(${items.length})`),
-        ),
-        el("div", { class: "grid" }, items.map(card)),
-      ),
-    );
+    frag.append(section(cat, experiments.filter((e) => e.category === cat)));
   }
 
   frag.append(
