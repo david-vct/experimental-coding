@@ -1,5 +1,6 @@
 {
   "repo": "https://github.com/david-vct/experimental-coding",
+  "me": "https://github.com/david-vct",
   "branch": "main",
   "experiments": [
     {
@@ -61,6 +62,26 @@
     },
 
     {
+      "slug": "glitch-mosaic",
+      "category": "visuals",
+      "title": "Glitch Mosaic",
+      "description": "A mosaic of genuinely glitched images, each one broken with a different technique.",
+      "tags": ["glitch", "layout", "generative"],
+      "type": "live",
+      "entry": "glitch-art/mosaic.html",
+      "language": "html"
+    },
+    {
+      "slug": "ascii-loader",
+      "category": "visuals",
+      "title": "ASCII Loader",
+      "description": "A six-frame loading spinner drawn as a FIGlet font: each digit 0-5 is a frame of the animation.",
+      "tags": ["ascii-art", "animation", "figlet"],
+      "type": "live",
+      "entry": "art/ascii-loader.html",
+      "language": "html"
+    },
+    {
       "slug": "mandelbrot",
       "category": "visuals",
       "title": "Mandelbrot",
@@ -79,16 +100,6 @@
       "tags": ["ascii-art", "typography", "figlet"],
       "type": "live",
       "entry": "art/meta-glyph-depth.html",
-      "language": "html"
-    },
-    {
-      "slug": "ascii-loader",
-      "category": "visuals",
-      "title": "ASCII Loader",
-      "description": "A six-frame loading spinner drawn as a FIGlet font: each digit 0-5 is a frame of the animation.",
-      "tags": ["ascii-art", "animation", "figlet"],
-      "type": "live",
-      "entry": "art/ascii-loader.html",
       "language": "html"
     },
 

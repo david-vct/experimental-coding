@@ -169,6 +169,8 @@ function gallery() {
         el("a", { href: repo, target: "_blank", rel: "noopener" }, "repo ↗"),
         " · ",
         el("a", { href: me, target: "_blank", rel: "noopener" }, "me ↗"),
+        " · ",
+        el("a", { href: "https://w.wiki/ULf", target: "_blank", rel: "noopener" }, "you ↗"),
       ),
     ),
   );

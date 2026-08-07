@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Glitch Art</title>
+    <style>
+        :root { color-scheme: dark; }
+        html, body {
+            height: 100%;
+            margin: 0;
+            background: #010105;
+            color: #a2a2bb;
+        }
+        body {
+            display: grid;
+            place-content: center;
+            overflow: hidden;
+            font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+        }
+        /* The mosaic box is sized in JS: exact pixels, no padding, no gap. */
+        #wall { position: relative; }
+        #wall img {
+            position: absolute;
+            display: block;
+            opacity: 0;
+            transition: opacity .5s ease, filter .35s ease;
+            /* Kills the sub-pixel seams left by fractional tile edges. */
+            transform: translateZ(0);
+        }
+        #wall img.in { opacity: 1; }
+        /* Hover: the pointed tile stays, the rest sinks into the background. */
+        #wall:hover img { filter: grayscale(.6) brightness(.45); }
+        #wall img:hover { filter: none; }
+        /* Raw caption, no box: it lies straight on the neighbouring tile, kept
+           legible by a hard black halo rather than a background. */
+        #note {
+            position: absolute;
+            /* Fixed, not shrink-to-fit: past the right edge of #wall the
+               available width goes to zero and the text folds into a column. */
+            width: 30ch;
+            margin: 0;
+            font-size: 12px;
+            line-height: 1.45;
+            white-space: pre-wrap;
+            color: #ececf6;
+            text-shadow: 0 0 2px #000, 0 0 6px #000, 0 1px 3px #000, 0 0 14px #000;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity .18s ease;
+        }
+        #note.on { opacity: 1; }
+        #note b { color: #8ab4ff; font-weight: 400; }
+        .err { color: #b45; font-size: 13px; }
+    </style>
+</head>
+
+<body>
+
+<div id="wall"></div>
+
+<script>
+// Files to show — every image sitting in this folder, with how it was bent.
+// Ratios are read from the files themselves, so any size mix works.
+const IMAGES = [
+    ["dracula.jpg", "quantization tables rewritten, plus a few bytes flipped in the compressed scan"],
+    ["earthrise.jpg", "compressed scan edited: repeating DCT blocks cloned, chroma coefficients shifted"],
+    ["le-fifre.jpg", "frame-header dimensions altered"],
+    ["ali-vs-liston.png", "PNG recompressed hard, pushed to true colour, and scanline filters rewritten"],
+    ["tian'anmen.jpg", "progressive JPEG, scan layers altered and horizontal quantization coefficients raised"],
+    ["console.png", "PNG scanline filters shifted line by line"],
+];
+
+(async () => {
+    const wall = document.getElementById("wall");
+
+    const load = ([src, note]) => new Promise((done) => {
+        const img = new Image();
+        img.onload = () => done({ src, note, w: img.naturalWidth, h: img.naturalHeight });
+        img.onerror = () => done(null);
+        img.src = src;
+    });
+
+    const pics = (await Promise.all(IMAGES.map(load))).filter(Boolean);
+    if (!pics.length) {
+        wall.innerHTML = '<p class="err">no image found</p>';
+        return;
+    }
+
+    // --- Packing ------------------------------------------------------------
+    // A random binary tree over the pictures. Two nodes are glued either side
+    // by side (same height, aspects add up) or one above the other (same width,
+    // inverse aspects add up). Both rules preserve every aspect ratio exactly,
+    // so the mosaic never crops nor distorts and never leaves a hole.
+    const aspect = (p) => p.w / p.h;
+
+    function grow(items) {
+        if (items.length === 1) return { pic: items[0], a: aspect(items[0]) };
+        const cut = 1 + Math.floor(Math.random() * (items.length - 1));
+        const A = grow(items.slice(0, cut));
+        const B = grow(items.slice(cut));
+        return Math.random() < 0.5
+            ? { row: true, A, B, a: A.a + B.a }
+            : { row: false, A, B, a: 1 / (1 / A.a + 1 / B.a) };
+    }
+
+    function spread(node, x, y, w, h, out) {
+        if (node.pic) { out.push({ pic: node.pic, x, y, w, h }); return; }
+        if (node.row) {
+            const w1 = w * node.A.a / (node.A.a + node.B.a);
+            spread(node.A, x, y, w1, h, out);
+            spread(node.B, x + w1, y, w - w1, h, out);
+        } else {
+            const h1 = h * (1 / node.A.a) / (1 / node.A.a + 1 / node.B.a);
+            spread(node.A, x, y, w, h1, out);
+            spread(node.B, x, y + h1, w, h - h1, out);
+        }
+    }
+
+    const shuffled = () => pics.map((p) => [Math.random(), p]).sort((a, b) => a[0] - b[0]).map((e) => e[1]);
+
+    // Aim for a square-ish block, pulled a third of the way towards the screen
+    // ratio so a wide viewport is not left mostly empty.
+    const target = () => Math.exp(0.35 * Math.log(innerWidth / innerHeight));
+
+    // --- Fitting ------------------------------------------------------------
+    // Biggest block of that shape the viewport can hold, then capped so no
+    // picture is ever blown up past its own pixels: originals are kept when
+    // they fit, and only shrunk when they cannot.
+    function fit(tree) {
+        const vw = innerWidth, vh = innerHeight;
+        let w = tree.a > vw / vh ? vw : vh * tree.a;
+        let h = w / tree.a;
+        let tiles = [];
+        spread(tree, 0, 0, w, h, tiles);
+        const up = Math.max(...tiles.map((t) => t.w / t.pic.w));
+        if (up > 1) {
+            w /= up; h /= up;
+            tiles = [];
+            spread(tree, 0, 0, w, h, tiles);
+        }
+        return { w, h, tiles };
+    }
+
+    // Draw many random trees and drop the lopsided ones. Among the square-ish
+    // survivors the shape alone is not enough: a stray thumbnail stuck in a wide
+    // slot caps the whole block down to a stamp, so keep only those that end up
+    // near the largest achievable size — then pick one at random. Always a solid
+    // block, never twice the same arrangement.
+    const tries = [];
+    for (let i = 0; i < 400; i++) {
+        const t = grow(shuffled());
+        tries.push({ t, off: Math.abs(Math.log(t.a / target())) });
+    }
+    tries.sort((a, b) => a.off - b.off);
+    const square = tries.filter((c) => c.off <= tries[0].off + 0.18);
+    for (const c of square) {
+        const f = fit(c.t);
+        c.area = f.w * f.h;
+        // Tile sizes should differ — that is the whole point of a bento — but a
+        // picture crushed to a stamp next to a huge one reads as a mistake.
+        c.evenness = Math.min(...f.tiles.map((t) => t.w * t.h)) * f.tiles.length / c.area;
+    }
+    const widest = Math.max(...square.map((c) => c.area));
+    const big = square.filter((c) => c.area >= widest * 0.75);
+    const even = big.filter((c) => c.evenness >= 0.12);
+    const keep = even.length ? even : big;
+    const tree = keep[Math.floor(Math.random() * keep.length)].t;
+
+    // --- Caption ------------------------------------------------------------
+    const note = document.createElement("p");
+    note.id = "note";
+
+    function label(pic, x, y, w) {
+        note.innerHTML = `<b>${pic.src}</b>\n${pic.note}`;
+        note.classList.add("on");
+
+        // Sits to the right of the tile, over whatever is next to it — unless
+        // the screen ends there, in which case it flips over the tile itself,
+        // right-aligned on the same edge. Then clamped so it is never cut off.
+        const wallBox = wall.getBoundingClientRect();
+        const nw = note.offsetWidth, nh = note.offsetHeight;
+        let left = x + w + 12;
+        if (wallBox.left + left + nw > innerWidth - 10) left = x + w - 12 - nw;
+        left = Math.max(left, 10 - wallBox.left);
+        let top = y + 10;
+        top = Math.min(top, innerHeight - 10 - nh - wallBox.top);
+        top = Math.max(top, 10 - wallBox.top);
+
+        note.style.left = `${left}px`;
+        note.style.top = `${top}px`;
+    }
+
+    function draw() {
+        const { w, h, tiles } = fit(tree);
+
+        wall.style.width = `${Math.round(w)}px`;
+        wall.style.height = `${Math.round(h)}px`;
+
+        wall.replaceChildren(...tiles.map((t) => {
+            // Round shared edges, not sizes: neighbours land on the same pixel.
+            const x = Math.round(t.x), y = Math.round(t.y);
+            const tw = Math.round(t.x + t.w) - x;
+            const el = document.createElement("img");
+            el.src = t.pic.src;
+            el.alt = "";
+            el.style.left = `${x}px`;
+            el.style.top = `${y}px`;
+            el.style.width = `${tw}px`;
+            el.style.height = `${Math.round(t.y + t.h) - y}px`;
+            el.addEventListener("pointerenter", () => label(t.pic, x, y, tw));
+            return el;
+        }), note);
+
+        requestAnimationFrame(() => wall.querySelectorAll("img").forEach((el, i) => {
+            setTimeout(() => el.classList.add("in"), i * 90);
+        }));
+    }
+
+    wall.addEventListener("pointerleave", () => note.classList.remove("on"));
+
+    draw();
+    let pending;
+    addEventListener("resize", () => { clearTimeout(pending); pending = setTimeout(draw, 120); });
+})();
+</script>
+
+</body>
+</html>
