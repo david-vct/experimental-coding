@@ -226,7 +226,14 @@ a.muted { color: var(--fg-dim); }
   display: block;
 }
 
-.preview--code { background: var(--bg-soft); }
+.preview--code {
+  background: var(--bg-soft);
+  display: flex;
+  align-items: center;
+  /* short snippets center; snippets taller than the preview fall back
+     to top-aligned instead of being clipped on both ends */
+  align-items: safe center;
+}
 .preview-code {
   margin: 0;
   padding: 0.75rem 0.9rem;
@@ -235,7 +242,10 @@ a.muted { color: var(--fg-dim); }
   color: var(--fg-dim);
   white-space: pre;
   overflow: hidden;
-  height: 100%;
+  max-height: 100%;
+  width: 100%;
+}
+.preview-code--clamped {
   /* fade the bottom so truncation reads as intentional */
   -webkit-mask-image: linear-gradient(#000 60%, transparent);
   mask-image: linear-gradient(#000 60%, transparent);

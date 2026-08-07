@@ -98,6 +98,9 @@ function previewNode(exp) {
   loadSource(exp).then((src) => {
     const snippet = src.split("\n").slice(0, 14).join("\n");
     pre.firstChild.innerHTML = highlightJs(snippet);
+    // only fade + clip when the snippet actually overflows the preview;
+    // short snippets stay centered with no truncation cue
+    pre.classList.toggle("preview-code--clamped", pre.scrollHeight > pre.clientHeight);
   });
   return el(
     "div",
