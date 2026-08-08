@@ -28,6 +28,8 @@
       "image":"screens/gol-hexalife.gif"
     },
 
+
+
     {
       "slug": "thomas-aquinas",
       "category": "quines",
@@ -51,13 +53,13 @@
       "image": "screens/q-counter.gif"
     },
     {
-      "slug": "var-shaped-quine",
-      "category": "quines",
-      "title": "Var-Shaped Quine",
-      "description": "A quine shaped as 'VAR', using only variables named var",
+      "slug": "log-shaped-quine",
+      "category": "quine",
+      "title": "Log-Shaped Quine",
+      "description": "A quine shaped as 'LOG', using only variables named log",
       "tags": ["quine", "ascii"],
       "type": "code-only",
-      "entry": "quines/var-shaped-quine.js",
+      "entry": "quines/log-shaped-quine.js",
       "language": "javascript"
     },
     {
@@ -70,6 +72,8 @@
       "entry": "quines/first-quine-v3.js",
       "language": "javascript"
     },
+
+
 
     {
       "slug": "glitch-mosaic",
@@ -113,6 +117,18 @@
       "language": "html"
     },
 
+    
+
+    {
+      "slug": "var-shaped-quine",
+      "category": "unremarkable",
+      "title": "Var-Shaped Quine",
+      "description": "A quine shaped as 'VAR', using only variables named var",
+      "tags": ["quine", "ascii"],
+      "type": "code-only",
+      "entry": "quines/var-shaped-quine.js",
+      "language": "javascript"
+    },
     {
       "slug": "first-quine-v1",
       "category": "unremarkable",

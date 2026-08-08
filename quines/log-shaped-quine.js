@@ -1,4 +1,4 @@
-(lоg  =()=>{lοg   =console
-.log ;lօg   =lоg .log
-;lօg ,lօg   =[]; lοg(   "("+
-`lоg  =${lоg})`  +"()")})()
+(lоg     =()=>{lοg   =console
+.log    ;let   log= lοg;
+log=    'lоg   ';;; lοg(   "("+
+`${log}  =${lоg})`  +"()")})()
