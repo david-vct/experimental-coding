@@ -272,7 +272,7 @@ async function openOverlay(exp) {
       exp.type === "live" &&
         el("a", { href: assetUrl(exp.entry), target: "_blank", rel: "noopener" }, "fullscreen ↗"),
       el("a", { href: repoUrl(exp.entry), target: "_blank", rel: "noopener" }, "git ↗"),
-      el("button", { class: "ov-close", "aria-label": "Close", onclick: () => { location.hash = "#/"; } }, "✕"),
+      el("button", { class: "ov-close", "aria-label": "Close", onclick: () => { location.hash = "#/"; } }),
     ),
   );
 

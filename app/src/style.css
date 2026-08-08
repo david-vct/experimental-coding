@@ -23,7 +23,7 @@
   --magenta: #d2a8ff;
   --cyan: #39c5cf; */
 
-  --red: #e14262;
+  --red: #b73667;
   --green: #65ea70;
   --yellow: #ffd562;
   --blue: #5daeff;
@@ -363,19 +363,31 @@ a.muted { color: var(--fg-dim); }
 .ov-title { color: var(--fg); font-weight: 600; }
 .ov-actions { display: flex; align-items: center; gap: 1rem; font-size: var(--fs); }
 
+/* the cross is drawn, not typed: exact optical centering, 1px stroke to
+   match the borders, and no third type size in the sheet. */
 .ov-close {
+  position: relative;
   background: none;
   border: 1px solid var(--line-bright);
   color: var(--fg-dim);
-  font-family: var(--mono);
-  font-size: var(--fs-sm);
   cursor: pointer;
   border-radius: 3px;
   width: 26px;
   height: 26px;
-  line-height: 1;
   padding: 0;
 }
+.ov-close::before,
+.ov-close::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 11px;
+  height: 1px;
+  background: currentColor;
+}
+.ov-close::before { transform: translate(-50%, -50%) rotate(45deg); }
+.ov-close::after { transform: translate(-50%, -50%) rotate(-45deg); }
 .ov-close:hover { color: var(--red); border-color: var(--red); }
 
 .ov-frame {
