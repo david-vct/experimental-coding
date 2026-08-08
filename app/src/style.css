@@ -23,8 +23,8 @@
   --magenta: #d2a8ff;
   --cyan: #39c5cf; */
 
-  --red: #ff5f56;
-  --green: #66ff73;
+  --red: #e14262;
+  --green: #65ea70;
   --yellow: #ffd562;
   --blue: #5daeff;
   --magenta: #cc9dff;
@@ -402,6 +402,8 @@ a.muted { color: var(--fg-dim); }
 .tok-number  { color: var(--yellow); }
 .tok-comment { color: var(--fg-faint); font-style: italic; }
 .tok-literal { color: var(--blue); }
+.tok-op      { color: var(--red); }
+.tok-interp  { color: var(--yellow); } /* `${...}` inside a template literal */
 
 /* ---------- responsive -------------------------------------------------- */
 
