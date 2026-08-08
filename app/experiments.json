@@ -54,7 +54,7 @@
     },
     {
       "slug": "log-shaped-quine",
-      "category": "quine",
+      "category": "quines",
       "title": "Log-Shaped Quine",
       "description": "A quine shaped as 'LOG', using only variables named log",
       "tags": ["quine", "ascii"],
@@ -117,7 +117,7 @@
       "language": "html"
     },
 
-    
+
 
     {
       "slug": "var-shaped-quine",
