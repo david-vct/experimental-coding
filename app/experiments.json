@@ -31,17 +31,6 @@
 
 
     {
-      "slug": "thomas-aquinas",
-      "category": "quines",
-      "title": "Thomas Aquinas",
-      "description": "An animated quine scrolling the Prima Via from Thomas Aquinas's Summa Theologica.",
-      "tags": ["quine", "animation", "esoteric"],
-      "type": "live",
-      "entry": "quines/thomas-aquinas-v3.html",
-      "language": "html",
-      "image": "screens/thomas-aquinas.gif"
-    },
-    {
       "slug": "q-counter",
       "category": "quines",
       "title": "Quine Counter",
@@ -61,6 +50,27 @@
       "type": "code-only",
       "entry": "quines/log-shaped-quine.js",
       "language": "javascript"
+    },
+    {
+      "slug": "polyglot-quine",
+      "category": "quines",
+      "title": "Polyglot Quine",
+      "description": "Two polyglot partial quines in the same file. Run with `node polyglot-quine.js.py ; python3 polyglot-quine.js.py`.",
+      "tags": ["quine", "polyglot", "code-golf"],
+      "type": "code-only",
+      "entry": "quines/polyglot-quine.js.py",
+      "language": "javascript+python"
+    },
+    {
+      "slug": "thomas-aquinas",
+      "category": "quines",
+      "title": "Thomas Aquinas",
+      "description": "An animated quine scrolling the Prima Via from Thomas Aquinas's Summa Theologica.",
+      "tags": ["quine", "animation", "esoteric"],
+      "type": "live",
+      "entry": "quines/thomas-aquinas-v3.html",
+      "language": "html",
+      "image": "screens/thomas-aquinas.gif"
     },
     {
       "slug": "first-quine-v3",
