@@ -130,6 +130,19 @@
 
 
     {
+      "slug": "true-is-false",
+      "category": "obfuscation",
+      "title": "True is False",
+      "description": "Four lines of look-alike Unicode identifiers that quietly redefine true.",
+      "tags": ["obfuscation", "unicode", "code-golf"],
+      "type": "code-only",
+      "entry": "obfuscation/true-is-false.js",
+      "language": "javascript"
+    },
+
+
+
+    {
       "slug": "var-shaped-quine",
       "category": "unremarkable",
       "title": "Var-Shaped Quine",
