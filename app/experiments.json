@@ -82,6 +82,16 @@
       "entry": "quines/first-quine-v3.js",
       "language": "javascript"
     },
+    {
+      "slug": "ocaml-quine-v1",
+      "category": "quines",
+      "title": "OCaml Quine",
+      "description": "A single-line OCaml quine: one anonymous function printing its argument raw, then quoted with %S.",
+      "tags": ["quine", "ocaml", "code-golf"],
+      "type": "code-only",
+      "entry": "quines/ocaml-quine-v1.ml",
+      "language": "ocaml"
+    },
 
 
 
@@ -137,6 +147,16 @@
       "tags": ["obfuscation", "unicode", "code-golf"],
       "type": "code-only",
       "entry": "obfuscation/true-is-false.js",
+      "language": "javascript"
+    },
+    {
+      "slug": "obfuscation-cheat-sheet",
+      "category": "obfuscation",
+      "title": "Obfuscation Cheat Sheet",
+      "description": "Literal-free JavaScript expressions for booleans, small numbers, and type conversions, printed from the source itself.",
+      "tags": ["obfuscation", "javascript", "reference"],
+      "type": "code-only",
+      "entry": "obfuscation/cheat-sheet.js",
       "language": "javascript"
     },
 
