@@ -30,26 +30,27 @@
         }
         #wall img.in { opacity: 1; }
         /* Hover: the pointed tile stays, the rest sinks into the background. */
-        #wall:hover img { filter: grayscale(.6) brightness(.45); }
+        #wall:hover img { filter: grayscale(.7) brightness(.28); }
         #wall img:hover { filter: none; }
-        /* Raw caption, no box: it lies straight on the neighbouring tile, kept
-           legible by a hard black halo rather than a background. */
+        /* Raw caption, no box: it lies straight on the picture in its top-left
+           corner, kept legible by a hard black halo alone. Free to spill over
+           the neighbouring tiles rather than fold into a column. */
         #note {
             position: absolute;
-            /* Fixed, not shrink-to-fit: past the right edge of #wall the
-               available width goes to zero and the text folds into a column. */
-            width: 30ch;
+            width: 32ch;
             margin: 0;
             font-size: 12px;
             line-height: 1.45;
             white-space: pre-wrap;
             color: #ececf6;
-            text-shadow: 0 0 2px #000, 0 0 6px #000, 0 1px 3px #000, 0 0 14px #000;
+            text-shadow: 0 0 2px #000, 0 0 4px #000, 0 0 6px #000, 0 1px 3px #000, 0 0 14px #000;
             pointer-events: none;
             opacity: 0;
             transition: opacity .18s ease;
         }
+        /* Shown only under the pointer — and only while the wall is not muted. */
         #note.on { opacity: 1; }
+        #wall.quiet #note { opacity: 0; }
         #note b { color: #8ab4ff; font-weight: 400; }
         .err { color: #b45; font-size: 13px; }
     </style>
@@ -169,22 +170,25 @@ const IMAGES = [
     const tree = keep[Math.floor(Math.random() * keep.length)].t;
 
     // --- Caption ------------------------------------------------------------
+    // One floating line of text, moved to whichever tile is under the pointer.
     const note = document.createElement("p");
     note.id = "note";
 
-    function label(pic, x, y, w) {
-        note.innerHTML = `<b>${pic.src}</b>\n${pic.note}`;
+    function label(pic, x, y) {
+        note.replaceChildren(
+            Object.assign(document.createElement("b"), { textContent: pic.src }),
+            `\n${pic.note}`,
+        );
         note.classList.add("on");
 
-        // Sits to the right of the tile, over whatever is next to it — unless
-        // the screen ends there, in which case it flips over the tile itself,
-        // right-aligned on the same edge. Then clamped so it is never cut off.
+        // Top-left corner of the tile, then clamped to the viewport so a caption
+        // wider or taller than its own tile is never cut off by the screen edge.
         const wallBox = wall.getBoundingClientRect();
         const nw = note.offsetWidth, nh = note.offsetHeight;
-        let left = x + w + 12;
-        if (wallBox.left + left + nw > innerWidth - 10) left = x + w - 12 - nw;
+        let left = x + 10;
+        left = Math.min(left, innerWidth - 10 - nw - wallBox.left);
         left = Math.max(left, 10 - wallBox.left);
-        let top = y + 10;
+        let top = y + 9;
         top = Math.min(top, innerHeight - 10 - nh - wallBox.top);
         top = Math.max(top, 10 - wallBox.top);
 
@@ -201,15 +205,14 @@ const IMAGES = [
         wall.replaceChildren(...tiles.map((t) => {
             // Round shared edges, not sizes: neighbours land on the same pixel.
             const x = Math.round(t.x), y = Math.round(t.y);
-            const tw = Math.round(t.x + t.w) - x;
             const el = document.createElement("img");
             el.src = t.pic.src;
             el.alt = "";
             el.style.left = `${x}px`;
             el.style.top = `${y}px`;
-            el.style.width = `${tw}px`;
+            el.style.width = `${Math.round(t.x + t.w) - x}px`;
             el.style.height = `${Math.round(t.y + t.h) - y}px`;
-            el.addEventListener("pointerenter", () => label(t.pic, x, y, tw));
+            el.addEventListener("pointerenter", () => label(t.pic, x, y));
             return el;
         }), note);
 
@@ -219,6 +222,8 @@ const IMAGES = [
     }
 
     wall.addEventListener("pointerleave", () => note.classList.remove("on"));
+    // A click mutes the captions altogether; the next one lets them speak again.
+    wall.addEventListener("click", () => wall.classList.toggle("quiet"));
 
     draw();
     let pending;
