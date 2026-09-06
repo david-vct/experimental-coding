@@ -50,33 +50,48 @@
   /* both sheets paint the same opaque ink: an overlap is two glyphs drawn on
      top of each other, never a brighter patch */
 
-  /* no transition while classes are swapped, so nothing fades through */
-  #stage.instant pre { transition: none; }
-
   /* solved, and the word has been typed at least once */
   #stage.solved pre {
     color: var(--green);
     text-shadow: 0 0 0.4em rgba(102, 255, 115, 0.3);
   }
 
-  /* one-shot reveal: the green wipes across the drawing */
-  #stage.reveal pre {
-    background-image: linear-gradient(100deg,
-      var(--green) 0 45%, var(--ink) 55% 100%);
-    background-size: 300% 100%;
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-    animation: wipe 0.9s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  /* first win: every row ignites on its own, bottom row first, the gaps
+     shrinking as the wave climbs (delays computed as --d in the script) */
+  #stage.reveal .ln {
+    animation: ignite 340ms linear var(--d, 0ms) both;
   }
 
-  /* the glow rides along with the wipe and lands exactly on the solved state,
-     so removing the class changes nothing on screen */
-  @keyframes wipe {
-    from { background-position: 100% 0; text-shadow: none; }
-    55%  { text-shadow: 0 0 0.55em rgba(102, 255, 115, 0.55); }
-    to   { background-position: 0 0;   text-shadow: 0 0 0.4em rgba(102, 255, 115, 0.3); }
+  /* the last frame is exactly the solved state, so dropping .reveal once the
+     wave is over changes nothing on screen */
+  @keyframes ignite {
+    0%   { color: var(--ink);   text-shadow: none; }
+    28%  { color: #ffffff;      text-shadow: 0 0 0.7em rgba(102, 255, 115, 0.9); }
+    55%  { color: var(--green); text-shadow: 0 0 0.8em rgba(102, 255, 115, 0.55); }
+    100% { color: var(--green); text-shadow: 0 0 0.4em rgba(102, 255, 115, 0.3); }
   }
+
+  /* the win banner: raw terminal output, no plate - a black halo does the
+     legibility work over the drawing */
+  #msg {
+    position: fixed;
+    top: 1.2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: clamp(11px, 1.25vw, 17px);
+    line-height: 1.65;
+    letter-spacing: 0.08em;
+    text-align: center;
+    white-space: pre;
+    pointer-events: none;
+    text-shadow: 0 0 4px var(--bg), 0 0 10px var(--bg), 0 0 20px var(--bg);
+    z-index: 2;
+  }
+  #msg .cmd { color: var(--fg-dim); }
+  #msg .res { color: var(--green); }
+
+  #caret { animation: blink 1s steps(1, end) infinite; }
+  @keyframes blink { 0%, 50% { opacity: 1; } 50.01%, 100% { opacity: 0; } }
 
   /* authoring blocks, never rendered */
   #src, #sheet-a, #sheet-b { display: none; }
@@ -184,11 +199,13 @@ _________\ //_________    _________\///_________\///_________ ///_________    __
   <pre id="base"></pre>
   <pre id="top"></pre>
 </div>
+<div id="msg"><div class="cmd"></div><div class="res"></div></div>
 <span id="probe"></span>
 
 <script>
 (() => {
   const WORD = 'win';          // what the drawing spells, and the passphrase
+  const t0 = performance.now(); // the clock the win banner reports
 
   /* ---------- sheets ---------------------------------------------------- */
   /* <pre> text as authored: the parser eats the newline right after the tag,
@@ -252,16 +269,31 @@ _________\ //_________    _________\///_________\///_________ ///_________    __
 
   let unlocked = false;
 
-  /* apply a class change with transitions suppressed (avoids a fade through
-     the transparent colour the wipe needs) */
-  function instant(fn) {
-    stage.classList.add('instant');
-    fn();
-    void stage.offsetWidth;          // flush styles before transitions return
-    stage.classList.remove('instant');
+  /* every row is its own <span> so the win wave can light them one at a time.
+     The wave starts on the bottom row and accelerates upwards: each gap is
+     EASE times the one below it, the whole run scaled to WAVE ms */
+  const WAVE = 1250, ROW_MS = 340, EASE = 0.88;
+  const DELAY = (() => {
+    const d = new Array(H);
+    let t = 0, gap = 1;
+    for (let y = H - 1; y >= 0; y--) { d[y] = t; t += gap; gap *= EASE; }
+    const k = WAVE / (d[0] || 1);
+    return d.map(v => Math.round(v * k));
+  })();
+
+  function paint(el, lines) {
+    const frag = document.createDocumentFragment();
+    lines.forEach((line, y) => {
+      const span = document.createElement('span');
+      span.className = 'ln';
+      span.style.setProperty('--d', DELAY[y] + 'ms');
+      span.textContent = y === H - 1 ? line : line + '\n';
+      frag.appendChild(span);
+    });
+    el.replaceChildren(frag);
   }
 
-  baseEl.textContent = A.join('\n');
+  paint(baseEl, A);
 
   function render() {
     const out = [];
@@ -271,8 +303,46 @@ _________\ //_________    _________\///_________\///_________ ///_________    __
       for (let x = 0; x < W; x++) row += B[sy][((x - dx) % W + W) % W];
       out.push(row);
     }
-    topEl.textContent = out.join('\n');
+    paint(topEl, out);
     stage.classList.toggle('solved', unlocked && aligned());
+  }
+
+  /* ---------- win banner ------------------------------------------------- */
+
+  const msgCmd = document.querySelector('#msg .cmd');
+  const msgRes = document.querySelector('#msg .res');
+  const caret = Object.assign(document.createElement('span'),
+    { id: 'caret', textContent: '\u2588' });
+
+  const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+  /* keystroke delay: a wide random spread around the base rhythm, a beat after
+     a word break or a punctuation mark, and now and then a real hesitation -
+     an even cadence reads as a machine printing, not as someone typing */
+  function keystroke(prev, base) {
+    let d = base * (0.55 + Math.random() * 0.9);
+    if (prev === ' ') d += base * 0.7;
+    if ('./-_:[]'.includes(prev)) d += base * 0.5;
+    if (Math.random() < 0.09) d += base * (1.5 + Math.random() * 2.5);
+    return d;
+  }
+
+  function type(el, text, base) {
+    const node = document.createTextNode('');
+    el.append(node, caret);
+    return new Promise(done => (function step() {
+      node.data = text.slice(0, node.data.length + 1);
+      node.data.length < text.length
+        ? setTimeout(step, keystroke(text[node.data.length - 1], base))
+        : done();
+    })());
+  }
+
+  async function banner(ms) {
+    await sleep(400);                       // a beat before the hands land
+    await type(msgCmd, '> ./verify ' + WORD, 85);
+    await sleep(650);                       // reading the command back
+    await type(msgRes, '[ok] solved in ' + (ms / 1000).toFixed(3) + 's', 85);
   }
 
   /* ---------- fit the grid to the viewport ------------------------------ */
@@ -320,13 +390,17 @@ _________\ //_________    _________\///_________\///_________ ///_________    __
     if (e.key.length !== 1 || !/[a-z]/i.test(e.key)) return;
     typed = (typed + e.key.toLowerCase()).slice(-WORD.length);
     if (!unlocked && typed === WORD && aligned()) {
+      const ms = performance.now() - t0;
       unlocked = true;
       render();
-      // both class swaps are done with transitions off: the wipe starts from
-      // the ink colour and ends on the solved green without a fade in between
-      instant(() => stage.classList.add('reveal'));
-      stage.addEventListener('animationend',
-        () => instant(() => stage.classList.remove('reveal')), { once: true });
+      // .solved and .reveal land in the same task: the rows are already under
+      // the animation when the green of .solved is first computed, so nothing
+      // flashes before the wave reaches it
+      stage.classList.add('reveal');
+      setTimeout(() => {
+        stage.classList.remove('reveal');   // ends on the solved state anyway
+        banner(ms);
+      }, DELAY[0] + ROW_MS + 60);
     }
   });
 
