@@ -27,6 +27,16 @@
       "language": "html",
       "image":"screens/gol-hexalife.gif"
     },
+    {
+      "slug": "puzzle-ascii",
+      "category": "simulations",
+      "title": "ASCII Puzzle",
+      "description": "One ASCII drawing split across two stacked sheets, the top one shifted at random. Move it back with the arrow keys, then type the word the drawing spells.",
+      "tags": ["ascii-art", "puzzle", "interactive"],
+      "type": "live",
+      "entry": "simulations/puzzle-ascii.html",
+      "language": "html"
+    },
 
 
 
